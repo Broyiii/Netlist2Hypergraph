@@ -62,7 +62,6 @@ void printHead()
     printf("+========================================================================+\n");
     printf("|                                                                        |\n");
     printf("|                     Netlist To Hypergraph Converter                    |\n");
-    printf("|                  Copyright (C) 2025 XI'DIAN UNIVERSITY                 |\n");
     printf("|                           Author : @Broyi                              |\n");
     printf("|                           Version: 2025-02-13 (V1.00)                  |\n");
     printf("|                           Run    : %s                 |\n", tmp);

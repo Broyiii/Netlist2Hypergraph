@@ -1,5 +1,5 @@
 # Netlist2Hypergraph
-## Netlist To Hypergraph Converter
+## Netlist To Hypergraph Converter (Only for flattened netlist !)
 Copyright (C) 2025 Broyiii<br>
 Author : @Broyiii<br>
 Version: 2025-02-13 (V1.00)<br>
