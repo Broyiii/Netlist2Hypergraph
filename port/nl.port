@@ -1,0 +1,41 @@
+module stratixiv_lcell_comb 
+{
+    input: cin, dataa, datab, datac, datad, datae, dataf, datag, sharein;
+    output: combout, sumout, cout, shareout;
+}
+
+module stratixiv_ram_block 
+{
+    input: portare, portawe, portbwe, portbre, portbdatain, portbaddrstall, clk0, clk1, ena0, ena1, ena2, ena3, clr0, clr1, portadatain, portaaddr, portbaddr;
+    output: portadataout, portbdataout;
+}
+
+module dffeas 
+{
+    input: clk, d, clrn, sclr, ena, asdata, sload;
+    output: q;
+}
+
+module stratixiv_mac_out 
+{
+    input: clk, aclr, ena, signa, signb, dataa, datab, datac, datad, round, saturate;
+    output: dataout;
+}
+
+module stratixiv_mac_mult 
+{
+    input: signa, signb, dataa, datab, clk, aclr, ena;
+    output: dataout, observabledataaregout, observabledatabregout;
+}
+
+module stratixiv_pll 
+{
+    input: areset, fbin, inclk;
+    output: locked, fbout, clk;
+}
+
+module stratixiv_io_obuf 
+{
+    input: i, oe;
+    output: o;
+}
