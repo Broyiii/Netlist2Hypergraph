@@ -730,6 +730,7 @@ void Parser::getHyperedges()
 {
     validInstanceNum = 0;
     validNetNum = 0;
+    ID2instance_.reserve(instances_.size());
     // 为了保证节点ID连续 通过net索引instance 被索引到的instance才会被分配ID
     for (auto &nets_iter : nets_)
     {
@@ -773,6 +774,7 @@ GEN_HYPEREDGE:
                 if (instances_[net->source_]->ID_ == -1)
                 {
                     instances_[net->source_]->ID_ = validInstanceNum;
+                    ID2instance_.emplace_back(instances_[net->source_]);
                     ++validInstanceNum;
                 }
                 hyperedges_.back().emplace_back(instances_[net->source_]->ID_);
@@ -782,6 +784,7 @@ GEN_HYPEREDGE:
                 if (instances_[dstInst]->ID_ == -1)
                 {
                     instances_[dstInst]->ID_ = validInstanceNum;
+                    ID2instance_.emplace_back(instances_[dstInst]);
                     ++validInstanceNum;
                 }
                 hyperedges_.back().emplace_back(instances_[dstInst]->ID_);
@@ -790,27 +793,33 @@ GEN_HYPEREDGE:
         }
     }
 
-    // TODO: 加入环检测并剔除环的功能
-    Acyclic acyclic(hyperedges_);
-    if (acyclic.detectRing())
+    if (!genDAG)
+        return;
+
+    // 环检测并剔除环
+    Acyclic acyclic(hyperedges_, ID2instance_);
+    if (acyclic.detectCycle())
     {
-        std::cout << "Hypergraph is NOT Acyclic ! Do Remove Ring !" << std::endl;
-        // auto hg = acyclic.removeRingTopological();
-        // auto hg = acyclic.removeCycleEdges();
-        // Acyclic acyclic_sub(hg);
-        // if (acyclic_sub.detectRing())
-        // {
-        //     std::cout << "Error ! Still NOT Acyclic !" << std::endl;
-        // }
-        // else
-        // {
-        //     std::cout << "New Hypergraph is Acyclic !" << std::endl;
-        //     hyperedges_ = hg;
-        // }
+        acyclicFlag = false;
+        std::cout << "Hypergraph is NOT Acyclic ! Do Remove Cycle !" << std::endl;
+        if (acyclic.removeCycle())
+        {
+            hyperedges_ = acyclic.getHypergraph();
+            weights_ = acyclic.getWeights();
+            validInstanceNum = weights_.size();
+            acyclicFlag = true;
+            std::cout << "Remove cycle SUCCESS !\n" << std::endl;
+        }
+        else
+        {
+            std::cout << "Remove cycle FAIL !\n" << std::endl;
+            acyclicFlag = false;
+        }
     }
     else
     {
-        std::cout << "Hypergraph is Acyclic !" << std::endl;
+        acyclicFlag = true;
+        std::cout << "Hypergraph is Acyclic !\n" << std::endl;
     }
 }
 
@@ -825,7 +834,10 @@ void Parser::writeHgr()
     }
 
     std::cout << "Net num = " << validNetNum << ", Instance num = " << validInstanceNum << std::endl;
-    file << validNetNum << " " << validInstanceNum << std::endl;
+    if (weights_.empty())
+        file << validNetNum << " " << validInstanceNum << std::endl;
+    else
+        file << validNetNum << " " << validInstanceNum << " 10" << std::endl;
     for (auto &hyperedge : hyperedges_)
     {
         for (int instID : hyperedge)
@@ -834,6 +846,14 @@ void Parser::writeHgr()
             file << instID + 1 << " ";
         }
         file << std::endl;
+    }
+
+    if (!weights_.empty())
+    {
+        for (int &wt : weights_)
+        {
+            file << wt << std::endl;
+        }
     }
 
     file.close();

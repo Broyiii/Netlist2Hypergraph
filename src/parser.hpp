@@ -25,7 +25,7 @@ struct NetInfo
 class Parser
 {
 public:
-    Parser(std::string netlist_dir, std::string port_dir, std::string hgr_dir) {
+    Parser(std::string netlist_dir, std::string port_dir, std::string hgr_dir, bool dag_flag) {
         netlistFile_ = std::ifstream(netlist_dir);
         if (!netlistFile_.is_open()) {
             std::cerr << "无法打开文件: " << netlist_dir << std::endl;
@@ -33,6 +33,7 @@ public:
         }
         portFileName_ = port_dir;
         hgrFile_ = hgr_dir;
+        genDAG = dag_flag;
     }
 
     ~Parser() {
@@ -54,8 +55,12 @@ private:
     std::ifstream netlistFile_;
     std::string portFileName_;
     std::string hgrFile_;
+    bool genDAG = false;
 
     std::vector<std::vector<int>> hyperedges_;
+    std::vector<int> weights_;
+    std::vector<std::shared_ptr<Instance>> ID2instance_;  // 通过节点ID索引instance
+    bool acyclicFlag = false;
     int validInstanceNum = 0;
     int validNetNum = 0;
 

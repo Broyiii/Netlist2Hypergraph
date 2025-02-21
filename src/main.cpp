@@ -19,6 +19,7 @@ int main(int argc, char* argv[]) {
     std::string netlistFile = "";
     std::string portFile = "";
     std::string hgrFile = "";
+    bool dagFlag = false;
     while (argIndex < (argc - 1))
     {
         std::string arg_str = argv[argIndex++];
@@ -34,6 +35,10 @@ int main(int argc, char* argv[]) {
         {
             portFile = argv[argIndex++];
         }
+        else if (arg_str == "-dag")
+        {
+            dagFlag = std::stoi(argv[argIndex++]);
+        }
         else
         {
             std::cout << "Error command : " << arg_str << "\n" << std::endl;
@@ -42,7 +47,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    Parser parser(netlistFile, portFile, hgrFile);
+    Parser parser(netlistFile, portFile, hgrFile, dagFlag);
     parser.parserFlow();
 
     auto end = std::chrono::system_clock::now();
@@ -74,5 +79,7 @@ void Usage()
 {
     std::cout << "Usage:\n\t./nl2hg -v <netlist_dir> -o <hgr_file_fir> [optional command]\n" << std::endl;
     std::cout << "Optional Command:" << std::endl;
-    std::cout << "\t-p <port_info_dir>" << "\n" << std::endl;
+    std::cout << "\t-p <port_info_dir>\n"
+              << "\t-dag <1/0>" 
+              << "\n" << std::endl;
 }
